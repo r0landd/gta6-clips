@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Video Scroller</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+    video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 100vh;
+      transform: translate(-50%, -50%);
+      object-fit: contain;
+      background: black;
+      display: none;
+    }
+    video.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <video class="active" loop muted autoplay playsinline></video>
+  <video loop muted autoplay playsinline></video>
+  <video loop muted autoplay playsinline></video>
+  <video loop muted autoplay playsinline></video>
+  <video loop muted autoplay playsinline></video>
+  <video loop muted autoplay playsinline></video>
+  <video loop muted autoplay playsinline></video>
+
+  <script>
+    const videoURLs = [
+      'https://www.rockstargames.com/VI/_next/static/media/Jason_Duval_Video_Clip.77b923d5c572070624409b5261094ac2.mp4',
+      'https://www.rockstargames.com/VI/_next/static/media/Lucia_Caminos_Video_Clip.d59efda1d4d3246a46ac0933a9708a02.mp4',
+      'https://www.rockstargames.com/VI/_next/static/media/Cal_Hampton_Video_Clip.eecac8064ee8bf422e6148d0c8c7f0fd.mp4',
+      'https://www.rockstargames.com/VI/_next/static/media/Boobie_Ike_Video_Clip.11eba6bddfcec18e02ebb936c29bb408.mp4',
+      'https://www.rockstargames.com/VI/_next/static/media/DreQuan_Priest_Video_Clip.7bf9e224a73feecc9ff2cfb719316fb0.mp4',
+      'https://www.rockstargames.com/VI/_next/static/media/Real_Dimez_Video_Clip.f80c102b78ee64d54c47b7b3442afb6f.mp4',
+      'https://www.rockstargames.com/VI/_next/static/media/Raul_Bautista_Video_Clip.65d80638d8b7b301e3c89b0dda141274.mp4',
+    ];
+
+    const videos = Array.from(document.querySelectorAll('video'));
+    let current = 0;
+
+    videos.forEach((video, i) => {
+      video.src = videoURLs[i];
+    });
+
+    function showVideo(index) {
+      videos.forEach((vid, i) => {
+        vid.classList.toggle('active', i === index);
+        vid.pause();
+        vid.currentTime = 0;
+      });
+      const vid = videos[index];
+      vid.play();
+      requestFullscreenIfNeeded();
+    }
+
+    function requestFullscreenIfNeeded() {
+      const elem = document.documentElement;
+      if (!document.fullscreenElement && elem.requestFullscreen) {
+        elem.requestFullscreen();
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') {
+        current = (current + 1) % videos.length;
+        showVideo(current);
+      } else if (e.key === 'ArrowLeft') {
+        current = (current - 1 + videos.length) % videos.length;
+        showVideo(current);
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        const vid = videos[current];
+        vid.paused ? vid.play() : vid.pause();
+      }
+    });
+
+
+    // Click to pause/play
+    videos.forEach(video => {
+      video.addEventListener('click', () => {
+        const vid = video;
+        if (vid.paused) {
+          vid.play();
+        } else {
+          vid.pause();
+        }
+      });
+
+      // Double-click to enter/exit fullscreen
+      video.addEventListener('dblclick', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          requestFullscreenIfNeeded();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
